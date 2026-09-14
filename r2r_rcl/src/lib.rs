@@ -7,6 +7,11 @@
 // It could be good to still warn if building with an older rust version.
 #![allow(improper_ctypes)]
 #![allow(improper_ctypes_definitions)]
+// bindgen derives PartialEq on structs holding C function pointers, which rustc
+// >= 1.85 flags because function addresses are not guaranteed to be unique. The
+// comparisons live in generated code we do not control, and nothing in r2r relies
+// on them being meaningful.
+#![allow(unpredictable_function_pointer_comparisons)]
 include!(concat!(env!("OUT_DIR"), "/rcl_bindings.rs"));
 
 use std::ffi::{CStr, CString};

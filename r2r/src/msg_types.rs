@@ -281,6 +281,9 @@ pub struct UntypedActionSupport {
 }
 
 impl UntypedActionSupport {
+    // Only called from the generated `new_from`, whose body has no call sites when
+    // the workspace exposes no action types.
+    #[allow(dead_code)]
     fn new<T>() -> Self
     where
         T: WrappedActionTypeSupport,
