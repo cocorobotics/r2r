@@ -17,6 +17,7 @@ const WATCHED_ENV_VARS: &[&str] = &[
     "CMAKE_PREFIX_PATH",
     "CMAKE_IDL_PACKAGES",
     "IDL_PACKAGE_FILTER",
+    "R2R_ROS_DISTRO",
     "ROS_DISTRO",
 ];
 
@@ -140,8 +141,11 @@ pub fn print_cargo_ros_distro() {
         return;
     }
 
-    let ros_distro =
-        env::var("ROS_DISTRO").unwrap_or_else(|_| panic!("ROS_DISTRO not set: Source your ROS!"));
+    // R2R_ROS_DISTRO wins over ROS_DISTRO so the ROS 2 distro can be pinned in
+    // environments that also source ROS 1 (whose setup overwrites ROS_DISTRO).
+    let ros_distro = env::var("R2R_ROS_DISTRO")
+        .or_else(|_| env::var("ROS_DISTRO"))
+        .unwrap_or_else(|_| panic!("ROS_DISTRO not set: Source your ROS!"));
 
     if SUPPORTED_ROS_DISTROS.contains(&ros_distro.as_str()) {
         println!("cargo:rustc-cfg=r2r__ros__distro__{ros_distro}");
